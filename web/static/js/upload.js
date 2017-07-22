@@ -205,12 +205,195 @@
         uploader.on( 'uploadSuccess', function( file ,response) {
            console.log("文件上传成功",file);
            console.log("文件上传成功",response);
-            //var fso = new ActiveXObject("Scripting.FileSystemObject");
-            //var file = fso.GetFile(response.path);
-            //var files = new File(response.path);
-            addFile(file);
+           //addFile1(response.id,response.name,response.src);
            // $( '#'+file.id ).find('p.state').text('已上传');
         });
+
+          $(function(){
+              var url = "/server/queryImageAction.jsp";
+              var options = {
+                  //beforeSubmit: validate,
+                  url: url,
+                  success: loadHeadUrl,
+                  type: 'post',
+                  dataType: 'json'
+              };
+              $.ajax(options);
+              function loadHeadUrl(data) {
+
+                  for(var i = 0 ; i < data.length;i++){
+                      addFile1(data[i].id,data[i].name,data[i].src);
+                  }
+                  if(data.length > 0){
+                      $placeHolder.addClass('element-invisible');
+                      $queue.show();
+                      $statusBar.removeClass('element-invisible');
+                      //$('#filePicker2').addClass('element-invisible');
+                      $upload.removeClass('state-pedding');
+                      $upload.addClass('state-finish');
+                      $statusBar.show();
+                      $upload.text('继续添加');
+                     /*$upload.text('继续添加');
+                      $upload.text('取消上传');*/
+                      uploader.refresh();
+                      updateStatus();
+                  }
+              }
+          })
+
+        function addFile1(id,name,src){
+            var img;
+
+           var  $li = $('<li id="' + file.id + '">' +
+            '<p class="title">' + file.name + '</p>' +
+            '<p class="imgWrap"></p>' +
+            '<p class="progress"><span></span></p>' +
+            '</li>'),
+                $btns = $('<div class="file-panel">' +
+                '<span class="cancel">删除</span>' +
+                '<span class="rotateRight">向右旋转</span>' +
+                '<span class="rotateLeft">向左旋转</span></div>').appendTo($li),
+                $prgress = $li.find('p.progress span'),
+                $wrap = $li.find('p.imgWrap');
+
+               img = $('<img src="' + src + '">');
+                $wrap.empty().append(img);
+
+
+          /*  file.on('statuschange', function (cur, prev) {
+                if (prev === 'progress') {
+                    $prgress.hide().width(0);
+                } else if (prev === 'queued') {
+                    $li.off('mouseenter mouseleave');
+                    $btns.remove();
+                }
+
+                // 成功
+                if (cur === 'error' || cur === 'invalid') {
+                    console.log(file.statusText);
+                    showError(file.statusText);
+                    percentages[ file.id ][ 1 ] = 1;
+                } else if (cur === 'interrupt') {
+                    showError('interrupt');
+                } else if (cur === 'queued') {
+                    percentages[ file.id ][ 1 ] = 0;
+                } else if (cur === 'progress') {
+                    $info.remove();
+                    $prgress.css('display', 'block');
+                } else if (cur === 'complete') {
+                    $li.append('<span class="success"></span>');
+                }
+
+                $li.removeClass('state-' + prev).addClass('state-' + cur);
+            });*/
+
+            $li.on('mouseenter', function () {
+                $btns.stop().animate({height: 30});
+            });
+
+            $li.on('mouseleave', function () {
+                $btns.stop().animate({height: 0});
+            });
+
+            $li.on('dblclick', function () {
+                var src = $(this).find('.imgWrap img').attr('src') ;
+                var imageName = $(this).find('.title').text();
+                console.log(imageName)
+                console.log($('#imageName').val());
+                $('#imageName').val(imageName);
+                $('#big img').attr("src",src);
+                var jcrop_api;
+                $('#target').Jcrop({
+                    onChange: showCoords,
+                    onSelect: showCoords,
+                    onRelease: clearCoords
+                }, function () {
+                    jcrop_api = this;
+                });
+
+
+                $('#exampleModal').modal('show');
+                //图片双击截图
+                $('.jcrop-holder').on('dblclick',function() {
+                    console.log("0000000" + "----" );
+
+                    var url = "/server/imageCut/imageCutAction.jsp";
+                    var options = {
+                        //beforeSubmit: validate,
+                        url: url,
+                        success: loadHeadUrl,
+                        type: 'post',
+                        dataType: 'json'
+                    };
+                    $('#coords').ajaxSubmit(options);
+                    function loadHeadUrl(data) {
+                        $('#targetss').attr("src", data.path);
+                    }
+                });
+            });
+
+
+
+
+            function showCoords(c)
+            {
+                $('#x1').val(c.x);
+                $('#y1').val(c.y);
+                $('#x2').val(c.x2);
+                $('#y2').val(c.y2);
+                $('#w').val(c.w);
+                $('#h').val(c.h);
+            };
+
+            function clearCoords()
+            {
+                $('#coords input').val('');
+            };
+
+            $('#coords').on('change','input',function(e){
+                var x1 = $('#x1').val(),
+                    x2 = $('#x2').val(),
+                    y1 = $('#y1').val(),
+                    y2 = $('#y2').val();
+                jcrop_api.setSelect([x1,y1,x2,y2]);
+            });
+
+
+            $btns.on('click', 'span', function () {
+                var index = $(this).index(),
+                    deg;
+
+                switch (index) {
+                    case 0:
+                        uploader.removeFile(file);
+                        return;
+
+                    case 1:
+                        file.rotation += 90;
+                        break;
+
+                    case 2:
+                        file.rotation -= 90;
+                        break;
+                }
+
+                if (supportTransition) {
+                    deg = 'rotate(' + file.rotation + 'deg)';
+                    $wrap.css({
+                        '-webkit-transform': deg,
+                        '-mos-transform': deg,
+                        '-o-transform': deg,
+                        'transform': deg
+                    });
+                } else {
+                    $wrap.css('filter', 'progid:DXImageTransform.Microsoft.BasicImage(rotation=' + (~~((file.rotation / 90) % 4 + 4) % 4) + ')');
+                }
+
+
+            });
+                $li.appendTo($queue);
+        }
+
 
         // 当有文件添加进来时执行，负责view的创建
         function addFile(file) {
@@ -487,6 +670,7 @@
         }
 
         function setState(val) {
+            console.log("setstate",val);
             var file, stats;
 
             if (val === state) {
