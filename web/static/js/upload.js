@@ -177,25 +177,10 @@
             return !denied;
         });
 
-        // uploader.on('filesQueued', function() {
-        //     uploader.sort(function( a, b ) {
-        //         if ( a.name < b.name )
-        //           return -1;
-        //         if ( a.name > b.name )
-        //           return 1;
-        //         return 0;
-        //     });
-        // });
-        
-
         // 添加“添加文件”的按钮，
         uploader.addButton({
             id: '#filePicker2',
             label: '继续添加'
-        });
-        uploader.addButton({
-            id: '#filePicker3',
-            label: '删除全部'
         });
 
         uploader.on('ready', function () {
@@ -232,20 +217,31 @@
                       $upload.removeClass('state-pedding');
                       $upload.addClass('state-finish');
                       $statusBar.show();
-                      $upload.text('继续添加');
+                     // $upload.text('继续添加');
                      /*$upload.text('继续添加');
                       $upload.text('取消上传');*/
                       uploader.refresh();
+                      $upload.text('使用图片');
                       updateStatus();
                   }
               }
           })
+            //点击取消上传，将所选图片的checkbox 去除
+        $('.cancelBtn').on('click', function () {
+            /* $('.filelist li p').each(function(){
+             console.log($(this).find('input[name="checkbox"]').attr("checked"))   ;
+             })*/
+            $("input[type='checkbox']").each(function () {
+                console.log($(this));
+            })
+        })
+
 
         function addFile1(id,name,src){
             var img;
 
-           var  $li = $('<li id="' + file.id + '">' +
-            '<p class="title">' + file.name + '</p>' +
+           var  $li = $('<li id="' + id + '" class="state-complete">' +
+            '<p class="title">' + name + '</p>' +
             '<p class="imgWrap"></p>' +
             '<p class="progress"><span></span></p>' +
             '</li>'),
@@ -255,37 +251,10 @@
                 '<span class="rotateLeft">向左旋转</span></div>').appendTo($li),
                 $prgress = $li.find('p.progress span'),
                 $wrap = $li.find('p.imgWrap');
-
                img = $('<img src="' + src + '">');
                 $wrap.empty().append(img);
-
-
-          /*  file.on('statuschange', function (cur, prev) {
-                if (prev === 'progress') {
-                    $prgress.hide().width(0);
-                } else if (prev === 'queued') {
-                    $li.off('mouseenter mouseleave');
-                    $btns.remove();
-                }
-
-                // 成功
-                if (cur === 'error' || cur === 'invalid') {
-                    console.log(file.statusText);
-                    showError(file.statusText);
-                    percentages[ file.id ][ 1 ] = 1;
-                } else if (cur === 'interrupt') {
-                    showError('interrupt');
-                } else if (cur === 'queued') {
-                    percentages[ file.id ][ 1 ] = 0;
-                } else if (cur === 'progress') {
-                    $info.remove();
-                    $prgress.css('display', 'block');
-                } else if (cur === 'complete') {
-                    $li.append('<span class="success"></span>');
-                }
-
-                $li.removeClass('state-' + prev).addClass('state-' + cur);
-            });*/
+                var checkbox = $('<input type="checkbox"/>') ;
+                $wrap.append(checkbox);
 
             $li.on('mouseenter', function () {
                 $btns.stop().animate({height: 30});
@@ -426,7 +395,6 @@
 
                         $info.text(text).appendTo($li);
                     };
-
             if (file.getStatus() === 'invalid') {
                 showError(file.statusText);
             } else {
@@ -463,7 +431,7 @@
                 file.rotation = 0;
             }
 
-            file.on('statuschange', function (cur, prev) {
+         /*   file.on('statuschange', function (cur, prev) {
                 if (prev === 'progress') {
                     $prgress.hide().width(0);
                 } else if (prev === 'queued') {
@@ -484,25 +452,25 @@
                     $info.remove();
                     $prgress.css('display', 'block');
                 } else if (cur === 'complete') {
-                    $li.append('<span class="success"></span>');
+                    //$li.append('<span class="success"></span>');
                 }
 
                 $li.removeClass('state-' + prev).addClass('state-' + cur);
-            });
+            });*/
 
             $li.on('mouseenter', function () {
+                console.log("99999999");
                 $btns.stop().animate({height: 30});
             });
 
             $li.on('mouseleave', function () {
+                console.log("999911111111111111");
                 $btns.stop().animate({height: 0});
             });
 
             $li.on('dblclick', function () {
                 var src = $(this).find('.imgWrap img').attr('src') ;
                 var imageName = $(this).find('.title').text();
-                console.log(imageName)
-                console.log($('#imageName').val());
                 $('#imageName').val(imageName);
                 $('#big img').attr("src",src);
                 var jcrop_api;
@@ -534,10 +502,6 @@
                     }
                 });
             });
-
-
-
-
             function showCoords(c)
             {
                 $('#x1').val(c.x);
@@ -590,25 +554,7 @@
                     });
                 } else {
                     $wrap.css('filter', 'progid:DXImageTransform.Microsoft.BasicImage(rotation=' + (~~((file.rotation / 90) % 4 + 4) % 4) + ')');
-                    // use jquery animate to rotation
-                    // $({
-                    //     rotation: rotation
-                    // }).animate({
-                    //     rotation: file.rotation
-                    // }, {
-                    //     easing: 'linear',
-                    //     step: function( now ) {
-                    //         now = now * Math.PI / 180;
-
-                    //         var cos = Math.cos( now ),
-                    //             sin = Math.sin( now );
-
-                    //         $wrap.css( 'filter', "progid:DXImageTransform.Microsoft.Matrix(M11=" + cos + ",M12=" + (-sin) + ",M21=" + sin + ",M22=" + cos + ",SizingMethod='auto expand')");
-                    //     }
-                    // });
                 }
-
-
             });
 
             $li.appendTo($queue);
@@ -711,7 +657,8 @@
                 case 'confirm':
                     $progress.hide();
                     $('#filePicker2').removeClass('element-invisible');
-                    $upload.text('开始上传');
+                    //$upload.text('开始上传');
+                    $upload.text('使用图片');
 
                     stats = uploader.getStats();
                     if (stats.successNum && !stats.uploadFailNum) {
@@ -817,5 +764,7 @@
         $upload.addClass('state-' + state);
         updateTotalProgress();
     });
+
+
 
 })(jQuery);

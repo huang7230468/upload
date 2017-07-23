@@ -23,19 +23,52 @@
 </head>
 <body>
 	<div class="container">
+
 		<div class="row main">
 	        <div class="demo">
-	            <header>
-	                <label>选择相册</label>
-	                <select class="selectedBox">
-	                    <option>酒店房型</option>
-	                    <option>酒店logo</option>
-	                    <option>酒店外景</option>
-	                </select>
-	                <div class="picSize" style="float: right;">
-	                    <h5>图片尺寸：<span>图片比例最好控制在3:2，请上传小于2M的图片，超过则无法上传。</span></h5>
-	                </div>
-	            </header>
+	            <!--<header>-->
+	                <!--<label>选择相册</label>-->
+	                <!--<select class="selectedBox">-->
+	                    <!--<option>酒店房型</option>-->
+	                    <!--<option>酒店logo</option>-->
+	                    <!--<option>酒店外景</option>-->
+	                <!--</select>-->
+	                <!--<div class="picSize" style="float: right;">-->
+	                    <!--<h5>图片尺寸：<span>图片比例最好控制在3:2，请上传小于2M的图片，超过则无法上传。</span></h5>-->
+	                <!--</div>-->
+	            <!--</header>-->
+				<!--目录结构-->
+				<div class="st_tree">
+					<h4>
+						上传图片目录
+					</h4>
+					<ul>
+						<li><a href="#" >酒店图片</a></li>
+						<li id="li1"><a href="#" >酒店logo</a></li>
+						<ul show="true" id="ul1" class="ul">
+							<li ><a href="#" >大图标</a></li>
+							<li ><a href="#" >小图标</a></li>
+						</ul>
+						<li id="li2"><a href="#" >酒店房型</a></li>
+						<ul id="ul2" class="ul">
+							<li ><a href="#" >客厅</a></li>
+							<li ><a href="#" >卧室</a></li>
+							<li id="li3"><a href="#" >房间</a></li>
+							<ul id="ul3" class="ul">
+								<li ><a href="#" >房间1</a></li>
+								<li ><a href="#">房间2</a></li>
+							</ul>
+						</ul>
+					</ul>
+					<button class="fileBox">创建文件夹</button>
+					<div class="fileName">
+						<label>文件名称：</label>
+						<input type="text" placeholder="请输入文件夹名称"/>
+						<input type="button" value="确定"/>
+					</div>
+				</div>
+				<!--目录结构结束-->
+				<!--右边图库开始-->
 	            <div id="uploader" class="wu-example">
 	                <div class="queueList">
 	                    <div id="dndArea" class="placeholder" id ="fileList">
@@ -49,7 +82,7 @@
 	                        <span class="percentage"></span>
 	                    </div><div class="info"></div>
 	                    <div class="btns">
-							<div class="cancelBtn">取消上传</div><div id="filePicker2"></div><div class="uploadBtn">开始上传</div>
+							<div class="cancelBtn">取消上传</div><div id="filePicker2"></div><div class="uploadBtn">使用图片</div>
 	                    </div>
 	                </div>
 	            </div>
@@ -80,5 +113,26 @@
 			</div>
 		</div>
 	</div>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$(".ul").hide();
+			$(".fileName").hide();
+			$("#li1").click(function()
+			{
+				$("#ul1").toggle();
+			});
+			$("#li2").click(function()
+			{
+				$("#ul2").toggle();
+			});
+			$("#li3").click(function()
+			{
+				$("#ul3").toggle();
+			});
+			$(".fileBox").click(function(){
+				$(".fileName").toggle();
+			})
+		})
+	</script>
 </body>
 </html>
